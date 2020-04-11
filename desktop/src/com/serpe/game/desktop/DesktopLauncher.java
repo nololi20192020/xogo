@@ -14,7 +14,7 @@ public class DesktopLauncher {
 		config.height = 500;
 		config.resizable=false;
 		config.overrideDensity=240;
-		config.addIcon("serpe.png", Files.FileType.Internal);//TODO solucionar
+		//config.addIcon("serpe.png", Files.FileType.Internal);//TODO solucionar
 		new LwjglApplication(new Xogo(), config);
 	}
 }
