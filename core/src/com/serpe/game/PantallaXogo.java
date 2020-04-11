@@ -39,9 +39,8 @@ public class PantallaXogo implements Screen, InputProcessor {
     public PantallaXogo(Xogo xogo) {
         this.xogo = xogo;
         batch = new SpriteBatch();
-
         serpe = new Serpe(new Vector2(28, 0));
-         virus= new Coronavirus(new Vector2(28,28));
+        virus= new Coronavirus(new Vector2(28,28));
 
         System.out.println(Gdx.files.getLocalStoragePath());
         String localStorage = Gdx.files.getLocalStoragePath() + "\\desktop\\build\\resources\\main\\";
@@ -67,14 +66,20 @@ public class PantallaXogo implements Screen, InputProcessor {
         batch.begin();
         if (iniciado) {//juego
             Gdx.app.log(LOG, "Xogo  iniciado");
-            //TODO a método aparte ?
-            debuxarSerpe(batch);
-            //TODO comprobar colision
+
+            //TODO comprobar colision con virus * 1 elemento
             if (Intersector.overlaps(serpe.getRectangulo(), virus.getRectangulo())){
                 System.out.println("Tocaod");
+                //añadir 1
+                int posicion = serpe.corpoSerpeSize();
+                Serpe serpe1 = new Serpe(new Vector2(serpe.getPosicion().x-posicion*28,
+                        (float)serpe.getPosicion().y-posicion*28));
+                serpe.addCorpoSerpe(serpe1);
+
                debuxarVirus(batch,true);
             }
-
+            //TODO a método aparte ?
+            debuxarSerpe(batch);
             debuxarVirus(batch,false);
 
 
@@ -104,7 +109,6 @@ public class PantallaXogo implements Screen, InputProcessor {
 
 
     private void debuxarSerpe(SpriteBatch batch) {
-
         float x = serpe.getPosicion().x;
         float y = serpe.getPosicion().y;
 
@@ -125,20 +129,54 @@ public class PantallaXogo implements Screen, InputProcessor {
         if (direccion.equals("ARRIBA")) {
             serpe.setPosicion(x, y + 1);
             batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
+            //debuxar corpo
+            if(serpe.corpoSerpeSize()>1){//debuxo corpo serpe
+                for(int i=1;i<serpe.corpoSerpeSize();i++){
+
+                    batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y-(28*i));
+                }
+
+            }
+
             System.out.println("Xarriba " + serpe.getPosicion().x + "  " + serpe.getPosicion().y);
             return;
         } else if (direccion.equals("ABAIXO")) {
             serpe.setPosicion(x, y - 1);
             batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
+            //debuxar corpo
+            if(serpe.corpoSerpeSize()>1){//debuxo corpo serpe
+                for(int i=1;i<serpe.corpoSerpeSize();i++){
+                    batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y+(28*i));
+                }
+
+            }
             System.out.println("Xabaixo " + serpe.getPosicion().x + "  " + serpe.getPosicion().y);
         } else if (direccion.equals("ESQUERDA")) {
             serpe.setPosicion(x - 1, y);
             batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
+            //debuxar corpo
+            if(serpe.corpoSerpeSize()>1){//debuxo corpo serpe
+                for(int i=1;i<serpe.corpoSerpeSize();i++){
+                    batch.draw(cabezaSerpe, serpe.getPosicion().x-(28*i), serpe.getPosicion().y);
+                }
+
+            }
             System.out.println("XEsquerda " + serpe.getPosicion().x + "  " + serpe.getPosicion().y);
         } else {//dereita por defecto
             serpe.setPosicion(x + 1, y);
             batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
+            if(serpe.corpoSerpeSize()>1){//debuxo corpo serpe
+                for(int i=1;i<serpe.corpoSerpeSize();i++){
+                    batch.draw(cabezaSerpe, serpe.getPosicion().x+(28*i), serpe.getPosicion().y);
+                }
+
+            }
             System.out.println("Xnormal " + serpe.getPosicion().x + "  " + serpe.getPosicion().y);
+        }
+        if(serpe.corpoSerpeSize()>1){
+            System.out.println("Tiene cola");
+        }else{
+            System.out.println("No tiene cola");
         }
     }
 

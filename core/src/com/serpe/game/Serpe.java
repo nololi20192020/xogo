@@ -1,24 +1,39 @@
 package com.serpe.game;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import java.awt.Point;
 import com.badlogic.gdx.math.Rectangle;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Serpe {
     protected Vector2 posicion;
-    private LinkedList<Point> body = new LinkedList<Point>();
+    private ArrayList<Serpe> corpoSerpe = new ArrayList<Serpe>();
     private Rectangle rectangulo;
 
 
     public Serpe(Vector2 posicion) {
         this.posicion = posicion;
-        Point p = new Point((int)posicion.x,(int)posicion.y);
-        body.add(p);
         rectangulo = new Rectangle();
         setTamanoRectangulo(28,28);
+    }
+
+    public void addCorpoSerpe(Serpe serpe){
+      corpoSerpe.add(serpe);
+    }
+
+    public ArrayList<Serpe> getCorpoSerpe() {
+        return corpoSerpe;
+    }
+
+    public void setCorpoSerpe(ArrayList<Serpe> corpoSerpe) {
+        this.corpoSerpe = corpoSerpe;
+    }
+
+    public int corpoSerpeSize(){
+        return corpoSerpe.size();
     }
 
     public Vector2 getPosicion() {
