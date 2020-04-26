@@ -19,32 +19,35 @@ public class PantallaXogo implements Screen, InputProcessor {
     SpriteBatch batch;
     private Texture cabezaSerpe;
     private Texture coronaVirus;
+    private Texture corpoSerpe;
     private Xogo xogo;
-    private static int tamanoCuadro = 28;
-
+    private float posX = 0;
+    private float posY = 0;
 
     private BitmapFont bitMapFont;
 
     private Serpe serpe;
-    private Coronavirus virus ;
+    private Coronavirus virus;
 
     private boolean iniciado;
     private boolean pause;
     private boolean finxogo;
     private boolean sair;
 
-
-    private  String direccion = "DERECHA";
+    private String direccion = "DERECHA";
 
     public PantallaXogo(Xogo xogo) {
         this.xogo = xogo;
         batch = new SpriteBatch();
-        serpe = new Serpe(new Vector2(28, 0));
-        virus= new Coronavirus(new Vector2(28,28));
+        //creo la serpiente con 2 rectángulos de cuerpo
+        serpe = new Serpe(new Vector2(150, 0));
+        serpe.addCorpoSerpe(new Serpe(new Vector2(122, 0)));
+        serpe.addCorpoSerpe(new Serpe(new Vector2(94, 0)));
+        virus = new Coronavirus(new Vector2(28, 28));
 
-        System.out.println(Gdx.files.getLocalStoragePath());
         String localStorage = Gdx.files.getLocalStoragePath() + "\\desktop\\build\\resources\\main\\";
-        cabezaSerpe = new Texture(localStorage + "cabezaserpe.png");
+        cabezaSerpe = new Texture(localStorage + "cabSerpe.png");
+        corpoSerpe = new Texture(localStorage + "corpoSerpe.png");
         coronaVirus = new Texture(localStorage + "coronavirus.png");
         bitMapFont = new BitmapFont();
         iniciado = false;
@@ -65,50 +68,32 @@ public class PantallaXogo implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         if (iniciado) {//juego
-            Gdx.app.log(LOG, "Xogo  iniciado");
-
-            //TODO comprobar colision con virus * 1 elemento
-            if (Intersector.overlaps(serpe.getRectangulo(), virus.getRectangulo())){
-                System.out.println("Tocaod");
-                //añadir 1
+            if (Intersector.overlaps(serpe.getRectangulo(), virus.getRectangulo())) {
                 int posicion = serpe.corpoSerpeSize();
-                Serpe serpe1 = new Serpe(new Vector2(serpe.getPosicion().x-posicion*28,
-                        (float)serpe.getPosicion().y-posicion*28));
+                //engadir 1 elemento
+                Serpe serpe1 = new Serpe(new Vector2(serpe.getPosicion().x - posicion * 28,
+                        (float) serpe.getPosicion().y - posicion * 28));
                 serpe.addCorpoSerpe(serpe1);
-
-               debuxarVirus(batch,true);
+                debuxarVirus(true);
             }
-            //TODO a método aparte ?
-            debuxarSerpe(batch);
-            debuxarVirus(batch,false);
-
-
-
+            moverSerpe();
+            for (int i = serpe.getCorpoSerpe().size() - 1; i > 0; i--) {
+                batch.draw(corpoSerpe, serpe.getCorpoSerpe().get(i).getPosicion().x,
+                        serpe.getCorpoSerpe().get(i).getPosicion().y);
+            }
+            batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
+            debuxarVirus(false);
+            batch.draw(coronaVirus, virus.getPosicion().x, virus.getPosicion().y);
         } else {//no iniciado
-
             bitMapFont.setColor(Color.BLACK);
             bitMapFont.draw(batch, "Pulse intro para iniciar o xogo", 250, 250);
         }
-
-
         batch.end();
     }
 
 
-    private void debuxarVirus(SpriteBatch batch, boolean novo) {
-        int posX = (int) virus.getPosicion().x;
-        int posY = (int) virus.getPosicion().y;
-        if(novo){//TODO comprobar que no colisione con la serpiente
-             posX = (int) (Math.random() * 700 + 0);
-            posY = (int) (Math.random() * 500 + 0);
-        }
-        virus.setPosicion(posX,posY);
-        System.out.println("Debuxando coronavirus en pos X " + posX + " pos y " + posY);
-        batch.draw(coronaVirus, virus.getPosicion().x, virus.getPosicion().y);
-    }
 
-
-    private void debuxarSerpe(SpriteBatch batch) {
+    private void moverSerpe() {
         float x = serpe.getPosicion().x;
         float y = serpe.getPosicion().y;
 
@@ -126,60 +111,64 @@ public class PantallaXogo implements Screen, InputProcessor {
             y = 500;
         }
 
+
         if (direccion.equals("ARRIBA")) {
-            serpe.setPosicion(x, y + 1);
-            batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
-            //debuxar corpo
-            if(serpe.corpoSerpeSize()>1){//debuxo corpo serpe
-                for(int i=1;i<serpe.corpoSerpeSize();i++){
-
-                    batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y-(28*i));
+            if (serpe.getCorpoSerpe().size() > 1) {
+                for (int i = serpe.getCorpoSerpe().size() - 1; i > 0; i--) {
+                    float posXPredecesor = serpe.getCorpoSerpe().get(i - 1).getPosicion().x;
+                    float posYPredecesor = serpe.getCorpoSerpe().get(i - 1).getPosicion().y;
+                    serpe.getCorpoSerpe().get(i).setPosicion(posXPredecesor, posYPredecesor - (28));
                 }
-
             }
-
-            System.out.println("Xarriba " + serpe.getPosicion().x + "  " + serpe.getPosicion().y);
-            return;
+            serpe.getCorpoSerpe().get(0).setPosicion(x, y + 1);//update en array
+            serpe.setPosicion(x, y + 1);//update en objeto
         } else if (direccion.equals("ABAIXO")) {
+            if (serpe.getCorpoSerpe().size() > 1) {
+                for (int i = serpe.getCorpoSerpe().size() - 1; i > 0; i--) {
+                    float posXPredecesor = serpe.getCorpoSerpe().get(i - 1).getPosicion().x;
+                    float posYPredecesor = serpe.getCorpoSerpe().get(i - 1).getPosicion().y;
+                    serpe.getCorpoSerpe().get(i).setPosicion(posXPredecesor, posYPredecesor + (28));
+                }
+            }
+            serpe.getCorpoSerpe().get(0).setPosicion(x, y - 1);
             serpe.setPosicion(x, y - 1);
-            batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
-            //debuxar corpo
-            if(serpe.corpoSerpeSize()>1){//debuxo corpo serpe
-                for(int i=1;i<serpe.corpoSerpeSize();i++){
-                    batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y+(28*i));
-                }
-
-            }
-            System.out.println("Xabaixo " + serpe.getPosicion().x + "  " + serpe.getPosicion().y);
         } else if (direccion.equals("ESQUERDA")) {
+            if (serpe.getCorpoSerpe().size() > 1) {
+                System.out.println("Ten corpo");
+                for (int i = serpe.getCorpoSerpe().size() - 1; i > 0; i--) {
+                    System.out.println("Debuxar cola " + i);
+                    float posXPredecesor = serpe.getCorpoSerpe().get(i - 1).getPosicion().x;
+                    float posYPredecesor = serpe.getCorpoSerpe().get(i - 1).getPosicion().y;
+                    serpe.getCorpoSerpe().get(i).setPosicion(posXPredecesor + 28, posYPredecesor);
+                }
+            }
+            serpe.getCorpoSerpe().get(0).setPosicion(x - 1, y);
             serpe.setPosicion(x - 1, y);
-            batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
-            //debuxar corpo
-            if(serpe.corpoSerpeSize()>1){//debuxo corpo serpe
-                for(int i=1;i<serpe.corpoSerpeSize();i++){
-                    batch.draw(cabezaSerpe, serpe.getPosicion().x-(28*i), serpe.getPosicion().y);
-                }
 
-            }
-            System.out.println("XEsquerda " + serpe.getPosicion().x + "  " + serpe.getPosicion().y);
         } else {//dereita por defecto
-            serpe.setPosicion(x + 1, y);
-            batch.draw(cabezaSerpe, serpe.getPosicion().x, serpe.getPosicion().y);
-            if(serpe.corpoSerpeSize()>1){//debuxo corpo serpe
-                for(int i=1;i<serpe.corpoSerpeSize();i++){
-                    batch.draw(cabezaSerpe, serpe.getPosicion().x+(28*i), serpe.getPosicion().y);
+            if (serpe.getCorpoSerpe().size() > 1) {
+                System.out.println("Ten corpo");
+                for (int i = serpe.getCorpoSerpe().size() - 1; i > 0; i--) {
+                    System.out.println("Debuxar cola " + i);
+                    float posXPredecesor = serpe.getCorpoSerpe().get(i - 1).getPosicion().x;
+                    float posYPredecesor = serpe.getCorpoSerpe().get(i - 1).getPosicion().y;
+                    serpe.getCorpoSerpe().get(i).setPosicion(posXPredecesor - 28, posYPredecesor);
                 }
-
             }
-            System.out.println("Xnormal " + serpe.getPosicion().x + "  " + serpe.getPosicion().y);
-        }
-        if(serpe.corpoSerpeSize()>1){
-            System.out.println("Tiene cola");
-        }else{
-            System.out.println("No tiene cola");
+            serpe.getCorpoSerpe().get(0).setPosicion(x + 1, y);
+            serpe.setPosicion(x + 1, y);
         }
     }
 
+    private void debuxarVirus(boolean novo) {
+        int posX = (int) virus.getPosicion().x;
+        int posY = (int) virus.getPosicion().y;
+        if (novo) {//TODO comprobar que no colisione con la serpiente al crear
+            posX = (int) (Math.random() * 672 + 28);
+            posY = (int) (Math.random() * 472 + 28);
+        }
+        virus.setPosicion(posX, posY);
+    }
 
     @Override
     public void resize(int i, int i1) {
@@ -211,18 +200,18 @@ public class PantallaXogo implements Screen, InputProcessor {
     public boolean keyDown(int i) {
         batch.begin();
         if (Input.Keys.UP == i) {
-            Gdx.app.log(LOG, "KEYUP" + i);//TODO si marco esto, mantengo x, sumo y
+            Gdx.app.log(LOG, "KEYUP" + i);
             direccion = "ARRIBA";
-        } else if (Input.Keys.DOWN == i) {//TODO si marco esto, mantengo x, resto y
+        } else if (Input.Keys.DOWN == i) {
             Gdx.app.log(LOG, "down" + i);
             direccion = "ABAIXO";
-        } else if (Input.Keys.LEFT == i) {//TODO si marco esto, mantengo y, resto x
+        } else if (Input.Keys.LEFT == i) {
             Gdx.app.log(LOG, "left" + i);
             direccion = "ESQUERDA";
-        } else if (Input.Keys.RIGHT == i) { ///TODO si marco esto, mantengo y, sumo x
+        } else if (Input.Keys.RIGHT == i) {
             Gdx.app.log(LOG, "right" + i);
             direccion = "DEREITA";
-        } else if (i == 66) {//buscar correspondencia
+        } else if (i == 66) {//TODO buscar correspondencia
             Gdx.app.log(LOG, "intro" + i);
             iniciado = true;
         }
