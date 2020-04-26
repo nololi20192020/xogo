@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
@@ -36,6 +37,7 @@ public class PantallaXogo implements Screen, InputProcessor {
     private boolean sair;
 
     private int contador,multiplicador;
+    Sound son;
 
     private String direccion = "DERECHA";
 
@@ -43,6 +45,7 @@ public class PantallaXogo implements Screen, InputProcessor {
         this.xogo = xogo;
         contador =0;
         multiplicador=0;
+
 
         batch = new SpriteBatch();
         //creo la serpiente con 2 rectángulos de cuerpo
@@ -52,6 +55,7 @@ public class PantallaXogo implements Screen, InputProcessor {
         virus = new Coronavirus(new Vector2(28, 28));
 
         String localStorage = Gdx.files.getLocalStoragePath() + "\\desktop\\build\\resources\\main\\";
+        son = Gdx.audio.newSound(Gdx.files.internal(localStorage +"berro.mp3"));
         cabezaSerpe = new Texture(localStorage + "cabSerpe.png");
         corpoSerpe = new Texture(localStorage + "corpoSerpe.png");
         coronaVirus = new Texture(localStorage + "coronavirus.png");
@@ -84,6 +88,7 @@ public class PantallaXogo implements Screen, InputProcessor {
                 Serpe serpe1 = new Serpe(new Vector2(serpe.getPosicion().x - posicion * 28,
                         (float) serpe.getPosicion().y - posicion * 28));
                 serpe.addCorpoSerpe(serpe1);
+                son.play();
                 contador +=50*multiplicador;
                 multiplicador++;
                 debuxarVirus(true);
@@ -205,6 +210,7 @@ public class PantallaXogo implements Screen, InputProcessor {
     @Override
     public void dispose() {
         Gdx.app.log(LOG, "Dispose PantallaXogoLogger");
+        son.dispose();
     }
 
 
