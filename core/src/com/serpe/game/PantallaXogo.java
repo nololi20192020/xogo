@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -34,10 +35,15 @@ public class PantallaXogo implements Screen, InputProcessor {
     private boolean finxogo;
     private boolean sair;
 
+    private int contador,multiplicador;
+
     private String direccion = "DERECHA";
 
     public PantallaXogo(Xogo xogo) {
         this.xogo = xogo;
+        contador =0;
+        multiplicador=0;
+
         batch = new SpriteBatch();
         //creo la serpiente con 2 rectángulos de cuerpo
         serpe = new Serpe(new Vector2(150, 0));
@@ -50,10 +56,12 @@ public class PantallaXogo implements Screen, InputProcessor {
         corpoSerpe = new Texture(localStorage + "corpoSerpe.png");
         coronaVirus = new Texture(localStorage + "coronavirus.png");
         bitMapFont = new BitmapFont();
+
         iniciado = false;
         pause = false;
         finxogo = false;
         sair = false;
+        System.out.println(contador);
     }
 
     @Override
@@ -64,16 +72,20 @@ public class PantallaXogo implements Screen, InputProcessor {
 
     @Override
     public void render(float v) {
+        System.out.println(contador);
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         if (iniciado) {//juego
+            bitMapFont.draw(batch, "Puntuacion : "+contador, 0,490);
             if (Intersector.overlaps(serpe.getRectangulo(), virus.getRectangulo())) {
                 int posicion = serpe.corpoSerpeSize();
                 //engadir 1 elemento
                 Serpe serpe1 = new Serpe(new Vector2(serpe.getPosicion().x - posicion * 28,
                         (float) serpe.getPosicion().y - posicion * 28));
                 serpe.addCorpoSerpe(serpe1);
+                contador +=50*multiplicador;
+                multiplicador++;
                 debuxarVirus(true);
             }
             moverSerpe();
