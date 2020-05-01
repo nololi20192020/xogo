@@ -42,6 +42,7 @@ public class PantallaXogo implements Screen, InputProcessor {
     private Sound sonAplausos;
 
     private String direccion = "DERECHA";
+    private int velocidade=1;
 
     public PantallaXogo(Xogo xogo) {
         this.xogo = xogo;
@@ -80,7 +81,7 @@ public class PantallaXogo implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         if (iniciado && finxogo == false) {//juego
-            bitMapFont.draw(batch, "Puntuacion : " + puntuacion, 0, 490);
+            bitMapFont.draw(batch, "Puntuacion : " + puntuacion, 5, 490);
             if (Intersector.overlaps(persoaEnfermeiro.getRectangulo(), persoaEnfermo.getRectangulo())) {
                 //engadir 1 obstáculo
                 crearVirus(true);
@@ -124,16 +125,17 @@ public class PantallaXogo implements Screen, InputProcessor {
         float y = persoaEnfermeiro.getPosicion().y;
 
         //para que si sale por los lados, aparezca por el opuesto
-        if (x == 700) {
+        if (x >= 700) {
+            Gdx.app.log(LOG, "Saliendo de la pantalla por lado derecho");
             x = 0;
-        }
-        if (y == 500) {
+        }else if (y >=500) {
+            Gdx.app.log(LOG, "Saliendo de la pantalla por arriba");
             y = 0;
-        }
-        if (x < 0) {
+        }else if (x <= 0) {
+            Gdx.app.log(LOG, "Saliendo de la pantalla por abajo");
             x = 700;
-        }
-        if (y < 0) {
+        }else if (y <= 0) {
+            Gdx.app.log(LOG, "Saliendo de la pantalla  por lado izquierdo");
             y = 500;
         }
 
