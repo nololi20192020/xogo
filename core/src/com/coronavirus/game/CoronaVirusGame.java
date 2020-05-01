@@ -13,8 +13,7 @@ public class CoronaVirusGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("serpe.png");
-
+		img = new Texture("coronavirus.png");
 	}
 
 	@Override

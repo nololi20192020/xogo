@@ -7,9 +7,10 @@ public class Xogo extends Game {
     private static final String LOG = "SerpeLogger";
 
      private PantallaXogo pantallaxogo;
+
     @Override
     public void create() {
-        Gdx.app.log(LOG, "Creado");
+        Gdx.app.log(LOG, "Xogo creado");
         pantallaxogo = new PantallaXogo(this);
         setScreen(pantallaxogo);
     }
@@ -17,7 +18,6 @@ public class Xogo extends Game {
     @Override
     public void render(){
         pantallaxogo.render(1f);
-
     }
 
     @Override
