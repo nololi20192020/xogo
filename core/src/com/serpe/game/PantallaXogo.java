@@ -13,49 +13,57 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class PantallaXogo implements Screen, InputProcessor {
     private static final String LOG = "PantallaXogoLogger";
 
     SpriteBatch batch;
     private Texture enfermeiro;
-  //  private Texture cabezaSerpe;
+    //  private Texture cabezaSerpe;
     private Texture coronaVirus;
-  //  private Texture corpoSerpe;
+    private Texture enfermo;
+    //  private Texture corpoSerpe;
     private Xogo xogo;
-    private float posX = 0;
-    private float posY = 0;
+    //private float posX = 0;
+    //private float posY = 0;
 
     private BitmapFont bitMapFont;
 
-    private Enfermeiro enfermeiro1;
+    private Persoa persoaEnfermeiro;
+    private Persoa persoaEnfermo;
 
-    private Coronavirus virus;
+    //   private Coronavirus virus;
+    List<Coronavirus> coronavirus_Elements;
 
     private boolean iniciado;
     private boolean pause;
     private boolean finxogo;
     private boolean sair;
 
-    private int contador,multiplicador;
+    private int contador, multiplicador;
     Sound son;
 
     private String direccion = "DERECHA";
 
     public PantallaXogo(Xogo xogo) {
         this.xogo = xogo;
-        contador =0;
-        multiplicador=0;
-
+        contador = 0;
+        multiplicador = 0;
+        coronavirus_Elements = new ArrayList<>();
 
         batch = new SpriteBatch();
         //creo el enfermero
-        enfermeiro1 = new Enfermeiro(new Vector2(150, 0));
-        virus = new Coronavirus(new Vector2(28, 28));
+        persoaEnfermeiro = new Persoa(new Vector2(150, 0));
+        persoaEnfermo = new Persoa(new Vector2(28, 28));
+        //virus = new Coronavirus(new Vector2(28, 28));
 
         String localStorage = Gdx.files.getLocalStoragePath() + "\\desktop\\build\\resources\\main\\";
-        son = Gdx.audio.newSound(Gdx.files.internal(localStorage +"berro.mp3"));
+        son = Gdx.audio.newSound(Gdx.files.internal(localStorage + "berro.mp3"));
         enfermeiro = new Texture(localStorage + "enfermeiro.jpg");
+        enfermo = new Texture(localStorage + "enfermo.jpg");
         coronaVirus = new Texture(localStorage + "coronavirus.png");
         bitMapFont = new BitmapFont();
 
@@ -79,20 +87,26 @@ public class PantallaXogo implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         if (iniciado) {//juego
-            bitMapFont.draw(batch, "Puntuacion : "+contador, 0,490);
-            if (Intersector.overlaps(enfermeiro1.getRectangulo(), virus.getRectangulo())) {
+            bitMapFont.draw(batch, "Puntuacion : " + contador, 0, 490);
+            if (Intersector.overlaps(persoaEnfermeiro.getRectangulo(), persoaEnfermo.getRectangulo())) {
 
                 //engadir 1 obstáculo
+                crearVirus(true);
 
-                son.play();
-                contador +=50*multiplicador;
+                son.play();//cambiar a aplausos
+                contador += 50 * multiplicador;
                 multiplicador++;
-                debuxarVirus(true);
+                crearEnfermo(true);
+            }
+           crearVirus(false);
+            for (int i = 0; i < coronavirus_Elements.size(); i++) {
+                batch.draw(coronaVirus, coronavirus_Elements.get(i).getPosicion().x,
+                        coronavirus_Elements.get(i).getPosicion().y);
             }
             moverEnfermeiro();
-            batch.draw(enfermeiro, enfermeiro1.getPosicion().x, enfermeiro1.getPosicion().y);
-            debuxarVirus(false);
-            batch.draw(coronaVirus, virus.getPosicion().x, virus.getPosicion().y);
+            batch.draw(enfermeiro, persoaEnfermeiro.getPosicion().x, persoaEnfermeiro.getPosicion().y);
+            crearEnfermo(false);
+            batch.draw(enfermo, persoaEnfermo.getPosicion().x, persoaEnfermo.getPosicion().y);
         } else {//no iniciado
             bitMapFont.setColor(Color.BLACK);
             bitMapFont.draw(batch, "Pulse intro para iniciar o xogo", 250, 250);
@@ -101,10 +115,9 @@ public class PantallaXogo implements Screen, InputProcessor {
     }
 
 
-
     private void moverEnfermeiro() {
-        float x = enfermeiro1.getPosicion().x;
-        float y = enfermeiro1.getPosicion().y;
+        float x = persoaEnfermeiro.getPosicion().x;
+        float y = persoaEnfermeiro.getPosicion().y;
 
         //para que si sale por los lados, aparezca por el opuesto
         if (x == 700) {
@@ -122,25 +135,53 @@ public class PantallaXogo implements Screen, InputProcessor {
 
 
         if (direccion.equals("ARRIBA")) {
-            enfermeiro1.setPosicion(x, y + 1);//update en objeto
+            persoaEnfermeiro.setPosicion(x, y + 1);//update en objeto
         } else if (direccion.equals("ABAIXO")) {
-            enfermeiro1.setPosicion(x, y - 1);
+            persoaEnfermeiro.setPosicion(x, y - 1);
         } else if (direccion.equals("ESQUERDA")) {
-                      enfermeiro1.setPosicion(x - 1, y);
+            persoaEnfermeiro.setPosicion(x - 1, y);
 
         } else {//dereita por defecto
-            enfermeiro1.setPosicion(x + 1, y);
+            persoaEnfermeiro.setPosicion(x + 1, y);
         }
     }
 
-    private void debuxarVirus(boolean novo) {
-        int posX = (int) virus.getPosicion().x;
-        int posY = (int) virus.getPosicion().y;
-        if (novo) {//TODO comprobar que no colisione con la serpiente al crear
-            posX = (int) (Math.random() * 672 + 28);
-            posY = (int) (Math.random() * 472 + 28);
+    private void crearEnfermo(boolean novo) {
+        int posX = (int) persoaEnfermo.getPosicion().x;
+        int posY = (int) persoaEnfermo.getPosicion().y;
+        boolean coincide=true;
+        if (novo) {
+            while(coincide) {
+                posX = (int) (Math.random() * 644 + 28);
+                posY = (int) (Math.random() * 444 + 28);
+                persoaEnfermo.setPosicion(posX, posY);
+                for (int i = 0; i < coronavirus_Elements.size(); i++) {
+                    System.out.println(Intersector.overlaps(persoaEnfermo.getRectangulo(), coronavirus_Elements.get(i).getRectangulo()));
+                    if (Intersector.overlaps(persoaEnfermo.getRectangulo(), coronavirus_Elements.get(i).getRectangulo())) {
+                        coincide=true;
+                        break;
+                    }
+                    coincide=false;
+                }
+            }
         }
-        virus.setPosicion(posX, posY);
+        persoaEnfermo.setPosicion(posX, posY);
+    }
+
+    private void crearVirus(boolean novo) {//meter en array de virus
+        //si es nuevo añado un nuevo virus
+        float posX = 0;
+        float posY = 0;
+        if (novo) {//si es nuevo
+            System.out.println("Creando nuevo virus");
+            posX = (float) (Math.random() * 644 + 28);
+            posY = (float) (Math.random() * 444 + 28);
+            Coronavirus coronavirusElement = new Coronavirus(new Vector2(posX, posY));
+            System.out.println(coronavirusElement.getPosicion().x);
+            System.out.println(coronavirus_Elements.size());
+            coronavirus_Elements.add(coronavirusElement);//añado elemento a la lista
+
+        }
     }
 
     @Override

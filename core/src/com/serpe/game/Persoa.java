@@ -3,12 +3,12 @@ package com.serpe.game;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public class Enfermeiro {
+public class Persoa {
     protected Vector2 posicion;
     private Rectangle rectangulo;
 
 
-    public Enfermeiro(Vector2 posicion) {
+    public Persoa(Vector2 posicion) {
         this.posicion = posicion;
         rectangulo = new Rectangle();
         setTamanoRectangulo(28,28);
