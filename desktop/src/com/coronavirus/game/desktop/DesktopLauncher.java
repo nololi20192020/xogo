@@ -1,15 +1,13 @@
-package com.serpe.game.desktop;
+package com.coronavirus.game.desktop;
 
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.serpe.game.SerpeGame;
-import com.serpe.game.Xogo;
+import com.coronavirus.game.Xogo;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "Xogo da Serpe";
+		config.title = "Xogo do Coronavirus";
 		config.width = 700;
 		config.height = 500;
 		config.resizable=false;

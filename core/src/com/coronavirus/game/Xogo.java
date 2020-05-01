@@ -1,9 +1,7 @@
-package com.serpe.game;
+package com.coronavirus.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Xogo extends Game {
     private static final String LOG = "SerpeLogger";

@@ -1,4 +1,4 @@
-package com.serpe.game;
+package com.coronavirus.game;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;

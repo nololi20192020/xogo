@@ -1,39 +1,17 @@
-package com.serpe.game;
+package com.coronavirus.game;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-import java.awt.Point;
-import com.badlogic.gdx.math.Rectangle;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-public class Serpe {
+public class Persoa {
     protected Vector2 posicion;
-    private ArrayList<Serpe> corpoSerpe = new ArrayList<Serpe>();
     private Rectangle rectangulo;
 
 
-    public Serpe(Vector2 posicion) {
+    public Persoa(Vector2 posicion) {
         this.posicion = posicion;
         rectangulo = new Rectangle();
         setTamanoRectangulo(28,28);
-    }
-
-    public void addCorpoSerpe(Serpe serpe){
-      corpoSerpe.add(serpe);
-    }
-
-    public ArrayList<Serpe> getCorpoSerpe() {
-        return corpoSerpe;
-    }
-
-    public void setCorpoSerpe(ArrayList<Serpe> corpoSerpe) {
-        this.corpoSerpe = corpoSerpe;
-    }
-
-    public int corpoSerpeSize(){
-        return corpoSerpe.size();
     }
 
     public Vector2 getPosicion() {
@@ -71,7 +49,7 @@ public class Serpe {
      *
      * @param delta: tempo entre unha chamada e a seguinte
      */
-
+//TODO revisar
     public void update(float delta) {
         posicion.set(getPosicion().x + 1, getPosicion().y);//aumento la x en 1
     }

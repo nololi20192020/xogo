@@ -1,4 +1,4 @@
-package com.serpe.game;
+package com.coronavirus.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -38,7 +38,7 @@ public class PantallaXogo implements Screen, InputProcessor {
     private boolean finxogo;
     private boolean sair;
 
-    private int contador, multiplicador;
+    private int puntuacion, multiplicador_puntuacion;
     Sound son;
 
     private String direccion = "DERECHA";
@@ -46,8 +46,8 @@ public class PantallaXogo implements Screen, InputProcessor {
     public PantallaXogo(Xogo xogo) {
         this.xogo = xogo;
         finxogo=false;
-        contador = 0;
-        multiplicador = 1;
+        puntuacion = 0;
+        multiplicador_puntuacion = 1;
 
         batch = new SpriteBatch();
         //creo el enfermero
@@ -80,14 +80,14 @@ public class PantallaXogo implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         if (iniciado && finxogo==false) {//juego
-            bitMapFont.draw(batch, "Puntuacion : " + contador, 0, 490);
+            bitMapFont.draw(batch, "Puntuacion : " + puntuacion, 0, 490);
             if (Intersector.overlaps(persoaEnfermeiro.getRectangulo(), persoaEnfermo.getRectangulo())) {
                 //engadir 1 obstáculo
                 crearVirus(true);
 
                 son.play();//cambiar a aplausos
-                contador += 50 * multiplicador;
-                multiplicador++;
+                puntuacion += 50 * multiplicador_puntuacion;
+                multiplicador_puntuacion++;
                 crearEnfermo(true);
             }
            crearVirus(false);
@@ -101,8 +101,9 @@ public class PantallaXogo implements Screen, InputProcessor {
             batch.draw(enfermo, persoaEnfermo.getPosicion().x, persoaEnfermo.getPosicion().y);
         } else if(finxogo){//fin xogo
             bitMapFont.setColor(Color.BLACK);
-            bitMapFont.draw(batch, "Fin do xogo, puntuación " + contador, 250, 250);
-        }else if(iniciado=false){//no iniciado y no fin de partida
+            bitMapFont.draw(batch, "Fin do xogo, puntuación : " + puntuacion, 250, 250);
+            bitMapFont.draw(batch, "Prema intro para reiniciar o xogo", 240, 200);
+        }else{//no iniciado y no fin de partida
             bitMapFont.setColor(Color.BLACK);
             bitMapFont.draw(batch, "Prema intro para iniciar o xogo", 250, 250);
         }
@@ -233,7 +234,7 @@ public class PantallaXogo implements Screen, InputProcessor {
             iniciado = true;
             finxogo=false;
             coronavirus_Elements=new ArrayList<>();
-            contador=0;
+            puntuacion =0;
         }
         batch.end();
         return false;
