@@ -115,6 +115,7 @@ public class PantallaXogo implements Screen, InputProcessor {
         for (int i = 0; i < coronavirus_Elements.size(); i++) {
             if (Intersector.overlaps(persoaEnfermeiro.getRectangulo(), coronavirus_Elements.get(i).getRectangulo())) {
                 sonBerro.play();
+                sonAplausos.stop();
                 finxogo = true;
                 iniciado = false;
             }
